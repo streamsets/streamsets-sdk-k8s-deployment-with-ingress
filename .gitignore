@@ -1,0 +1,12 @@
+*.pyc
+.DS_Store
+.cache
+_build
+.idea
+*.iml
+.gitreview
+.python-version
+__pycache__
+venv/*
+private/sdk-env.sh
+*.zip

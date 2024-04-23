@@ -1,0 +1,98 @@
+[deployment]
+
+# Control Hub URL
+# For example:
+# SCH_URL=https://na01.hub.streamsets.com
+SCH_URL=
+
+# Your Organization ID
+# For example:
+# ORG_ID=8030c2e9-xxxx-xxxx-xxxx-97c8d4369386
+ORG_ID=
+
+# Pre-existing Kubernetes Environment with online Agent
+# For example:
+# ENVIRONMENT_NAME=aks-ns1
+ENVIRONMENT_NAME=
+
+# Hostname for the load balancer
+# For example:
+# LOAD_BALANCER_HOSTNAME=aks.onefoursix.com
+LOAD_BALANCER_HOSTNAME=
+
+# Set to http or https for the desired SDC scheme and load balancer backend protocol
+# For example:
+# BACKEND_PROTOCOL=https
+BACKEND_PROTOCOL=
+
+# Whether to create a ClusterIP or NodePort Service
+# For example:
+# SERVICE_TYPE=NodePort  or SERVICE_TYPE=ClusterIP
+# Default is ClusterIP
+SERVICE_TYPE=ClusterIP
+
+# If SERVICE_TYPE=NodePort set the starting 
+# port for the NodePort Service(s), typically in the 30000 - 32767 range.
+# If multiple NodePort-based deployments are created in a single run, 
+# the NodePort Service port will be incremented to the next number.
+# This property can be omitted or will otherwise be ignored if SERVICE_TYPE=ClusterIP
+# For example:
+# STARTING_NODE_PORT_SERVICE_PORT=31630
+STARTING_NODE_PORT_SERVICE_PORT=
+
+# An SDC deployment manifest template that also includes a service and ingress
+# For example:
+# SDC_DEPLOYMENT_MANIFEST=yaml/sdc-service-ingress.yaml
+SDC_DEPLOYMENT_MANIFEST=
+
+# The SDC version
+# For example:
+# SDC_VERSION=5.10.0
+SDC_VERSION=
+
+# Comma delimited list of deployment tags
+# For example:
+# DEPLOYMENT_TAGS=k8s-sdc-5.10.0,california
+DEPLOYMENT_TAGS=
+
+# Comma delimited list of stage libs (short names)
+# For example:
+# USER_STAGE_LIBS=apache-kafka_3_4,aws,aws-secrets-manager-credentialstore,jdbc,jython_2_7,sdc-snowflake
+USER_STAGE_LIBS=
+
+# Engine Labels
+# For example:
+# ENGINE_LABELS=dev,california
+ENGINE_LABELS=
+
+# Engine thresholds
+# For example:
+# SDC_MAX_CPU_LOAD=90.0
+# SDC_MAX_MEMORY_USED=95.0
+# SDC_MAX_PIPELINES_RUNNING=10
+SDC_MAX_CPU_LOAD=
+SDC_MAX_MEMORY_USED=
+SDC_MAX_PIPELINES_RUNNING=
+
+
+# Java Settings for the Engine
+# For example:
+# SDC_JAVA_MIN_HEAP_MB=2024
+# SDC_JAVA_MAX_HEAP_MB=2024
+# SDC_JAVA_OPTS=""
+SDC_JAVA_MIN_HEAP_MB:
+SDC_JAVA_MAX_HEAP_MB:
+SDC_JAVA_OPTS=""
+
+# Kubernetes requests and limits
+# For example:
+# REQUESTS_MEMORY=3Gi
+# LIMITS_MEMORY=4Gi
+# REQUESTS_CPU=1000m
+# LIMITS_CPU=3000m
+REQUESTS_MEMORY=
+LIMITS_MEMORY=
+REQUESTS_CPU=
+LIMITS_CPU=
+
+
