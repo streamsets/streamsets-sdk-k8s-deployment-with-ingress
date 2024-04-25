@@ -213,7 +213,7 @@ LIMITS_CPU=3000m
 ```
 
 #### Using a custom ServiceAccount for SDC
-If you want to use a custom ServiceAccount for SDC, make sure the ServiceAccount exists in advance and is bound to a role that grants read permissions on secrets, and then set the <code>SDC_SERVICE_ACCOUNT</code> property in your <code>deployment.properties</code>.  If that property is not included in the <code>deployment.properties</code> file or is not set, the <default> ServiceAccount will be used.
+If you want to use a custom ServiceAccount for SDC, make sure the ServiceAccount exists in advance and is bound to a role that grants read permissions on secrets, and then set the <code>SDC_SERVICE_ACCOUNT</code> property in your <code>deployment.properties</code>.  If that property is not included in the <code>deployment.properties</code> file or is not set, the <code>default</code> ServiceAccount will be used.
 
 See the manifest [here](yaml/create-sdc-sa-example.yaml) for an example of how to create a ServiceAccount, Role, and RoleBinding with the appropriate RBAC permission.
 
