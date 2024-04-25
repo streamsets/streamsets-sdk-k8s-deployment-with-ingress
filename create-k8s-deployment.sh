@@ -8,6 +8,13 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
+# Make sure there is only one deployment suffix in the list
+if [[ ${3} == *,* ]]; then
+  echo "Error: Deployment Suffix contains a comma."
+  echo "Use the 'create-multiple-k8s-deployments.sh' script if you intend to create multiple deployments.'"
+  exit 1
+fi
+
 # Set Control Hub credentials
 source private/sdk-env.sh
 
