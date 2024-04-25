@@ -183,7 +183,7 @@ Make sure the Kubernetes Agent comes online for the Environment. For example, he
 Clone this project to your local machine. 
 
 #### Create a deployment.properties file
-Create a deployment.properties file (the file name and location are not criticial). You can start by copying the example properties files in the [config/examples](config/examples) directory, and/or you can refer to the [config/deployment.properties.template](config/deployment.properties.template) for documentation and examples of each property. 
+Create a deployment.properties file (the file name and location are not criticial). You can start by copying one of the example properties files in the [config/examples](config/examples) directory, and/or you can refer to the [config/deployment.properties.template](config/deployment.properties.template) for documentation and examples of each property. 
 
 For example, here is a <code>deployment.properties</code> file for an AKS environment that uses HTTPS for a backend protocol with a custom keystore, and a ClusterIP service:
 
@@ -211,6 +211,15 @@ LIMITS_MEMORY=2Gi
 REQUESTS_CPU=1000m
 LIMITS_CPU=3000m
 ```
+
+#### Using a custom ServiceAccount for SDC
+If you want to use a custom ServiceAccount for SDC, make sure the ServiceAccount exists in advance and is bound to a role that grants read permissions on secrets, and then set the <code>SDC_SERVICE_ACCOUNT</code> property in your <code>deployment.properties</code>.  If that property is not included in the <code>deployment.properties</code> file or is not set, the <default> ServiceAccount will be used.
+
+See the manifest [here](yaml/create-sdc-sa-example.yaml) for an example of how to create a ServiceAccount, Role, and RoleBinding with the appropriate RBAC permission.
+
+#### Service Types
+Most commonly, the <code>SERVICE_TYPE</code> property will be set to <code>ClusterIP</code>. However, if you want to create <code>NodePort</code> services, set the <code>SERVICE_TYPE</code> property to <code>NodePort</code> and also set the <code>STARTING_NODE_PORT_SERVICE_PORT</code> property to a value between 30000 and 32767.  If multiple deployments are created in a single run, this starting value will be incremented by 1 for each subsequent deployment.
+
 
 #### Edit additional config files  (optional) 
 
@@ -300,6 +309,8 @@ Deployment Suffix:  sdc1
 2024-04-21 21:30:11 ---
 2024-04-21 21:30:12 Done
 ```
+
+
 
 #### Inspect the Deployment
 You should see a new Deployment in Control Hub in a Deactivated state.  (You can uncomment the second to last line in the Python script to have Deployments autostart once you have confidence in the process.)

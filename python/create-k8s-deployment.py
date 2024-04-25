@@ -16,6 +16,7 @@ Prerequisites:
 
 import datetime
 import os
+import re
 import sys
 
 from streamsets.sdk import ControlHub
@@ -24,7 +25,7 @@ from config_manager import ConfigManager
 
 # Check the number of command line args
 if len(sys.argv) not in (4, 5):
-    print('Error:Wrong number of arguments')
+    print('Error: Wrong number of arguments')
     print('Usage: $ python3 create-k8s-deployment.py <deployment_properties_file> <environment_name> <deployment_suffix> [<deployment_index>]')
     print('Usage Example: $ python3 create-k8s-deployment.py config/eks-deployment.properties env-1 sdc1')
     sys.exit(1)
@@ -34,11 +35,18 @@ deployment_properties_file = sys.argv[1]
 environment_name = sys.argv[2]
 deployment_suffix = sys.argv[3]
 
+# Make sure deployment suffix is valid
+if not re.match("^[A-Za-z0-9-]*$", deployment_suffix):
+    print('Error: Deployment suffix \'{}\' is invalid. It should only contain letters, numbers, or a hyphen.'.format(deployment_suffix))
+    sys.exit(1)
+
 # If this script is called multiple times in a single run, we'll keep track using the deployment index
 if len(sys.argv) == 5:
     deployment_index = int(sys.argv[4])
 else:
     deployment_index = 0
+
+
 
 
 def print_message(message):
@@ -179,6 +187,7 @@ short_deployment_id = deployment.deployment_id[0:deployment.deployment_id.index(
 yaml = replace_in_yaml(yaml, '${DEP_ID}', short_deployment_id)
 yaml = replace_in_yaml(yaml, '${NAMESPACE}', namespace)
 yaml = replace_in_yaml(yaml, '${SDC_VERSION}', config.get('SDC_VERSION'))
+yaml = replace_in_yaml(yaml, '${SDC_SERVICE_ACCOUNT}', config.get_sdc_service_account())
 yaml = replace_in_yaml(yaml, '${ORG_ID}', config.get('ORG_ID'))
 yaml = replace_in_yaml(yaml, '${SCH_URL}', config.get('SCH_URL'))
 yaml = replace_in_yaml(yaml, '${REQUESTS_MEMORY}', config.get('REQUESTS_MEMORY'))
@@ -192,6 +201,9 @@ yaml = replace_in_yaml(yaml, '${LOAD_BALANCER_HOSTNAME}', config.get('LOAD_BALAN
 yaml = replace_in_yaml(yaml, '${BACKEND_PROTOCOL}', config.get('BACKEND_PROTOCOL').upper())
 yaml = replace_in_yaml(yaml, '${KEYSTORE}', config.get('SDC_KEYSTORE'))
 print_message('---')
+
+# Print the generated yaml if needed for debugging
+# print(yaml)
 
 # Assign the yaml to the deployment
 deployment.yaml = yaml

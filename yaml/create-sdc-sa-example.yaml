@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sdc-sa
+  namespace: ns1
+  labels:
+    app: sdc-sa
+    
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sdc-sa-role
+  namespace: ns1
+  labels:
+    app: sdc-sa-role
+    
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sdc-sa-rb
+  namespace: ns1
+  labels:
+    app: sdc-sa-rb
+    
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sdc-sa-role
+subjects:
+  - kind: ServiceAccount
+    name: sdc-sa
+    namespace: ns1

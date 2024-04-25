@@ -15,6 +15,7 @@ spec:
       labels:
         app: streamsets-deployment-${DEP_ID}
     spec:
+      serviceAccountName: ${SDC_SERVICE_ACCOUNT}
       containers:
       - name: streamsets-engine-${DEP_ID}
         image: streamsets/datacollector:${SDC_VERSION}

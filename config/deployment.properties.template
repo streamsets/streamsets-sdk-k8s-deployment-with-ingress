@@ -25,6 +25,13 @@ LOAD_BALANCER_HOSTNAME=
 # BACKEND_PROTOCOL=https
 BACKEND_PROTOCOL=
 
+# [Optional] Set to the name of a ServiceAccount for SDC Deployments
+# The ServiceAccount must exist in advance.
+# This property can be omitted or left blank; in either case the default ServiceAccount will be used
+# For example:
+# SDC_SERVICE_ACCOUNT=sdc-sa
+SDC_SERVICE_ACCOUNT=
+
 # Whether to create a ClusterIP or NodePort Service
 # For example:
 # SERVICE_TYPE=NodePort  or SERVICE_TYPE=ClusterIP

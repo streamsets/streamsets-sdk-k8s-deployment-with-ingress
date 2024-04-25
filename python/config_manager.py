@@ -120,10 +120,7 @@ class ConfigManager:
             value = self.deployment_properties[key].strip()
             if len(value) > 0:
                 return value.split(',')
-            else:
-                return []
-        else:
-            return []
+        return []
 
     def get_deployment_tags(self):
         return self.get_property_array_value('DEPLOYMENT_TAGS')
@@ -133,6 +130,16 @@ class ConfigManager:
 
     def get_engine_labels(self):
         return self.get_property_array_value('ENGINE_LABELS')
+
+    # Get the SDC Service Account from the deployment properties
+    # If the property does not exist or is empty, return 'default"
+    def get_sdc_service_account(self):
+        if 'SDC_SERVICE_ACCOUNT' in self.deployment_properties.keys():
+            sa = self.deployment_properties['SDC_SERVICE_ACCOUNT'].strip()
+            if len(sa) > 0:
+                return sa
+        return 'default'
+
 
     def get(self, key):
         return self.deployment_properties[key]
