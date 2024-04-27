@@ -5,7 +5,7 @@ The project creates one or more [Kubernetes Deployments](https://docs.streamsets
 
 This project can be used to deploy SDC on Kubernetes with two different approaches. The first approach is best for use on Kubernetes environments that support LoadBalancer based ingress (like all public cloud Kubernetes providers). The second approach is best to use with single-instance standalone Kubernetes providers, for example Rancher running on your laptop.
 
-#### Approach #1 - Using an Ingress Controller with path-based routing
+### Approach #1 - Using an Ingress Controller with path-based routing
 
 One or more single instance SDC Deployments will be deployed, each with a Service (either a ClusterIP or NodePort Service) and an Ingress, and a single Ingress Controller with path based routing, with either TLS terminated at the Ingress Controller, and with either HTTP or HTTPS-based communication from the Ingress Controller to the SDC backends. 
 
@@ -29,7 +29,7 @@ If you want to use a NodePort Service with an Ingress Controller, make sure to a
 The ingress examples below use [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) as an Ingress Controller on both Azure Kubernetes Service (AKS) and Amazon Elastic Kubernetes Service (EKS).
 
 
-#### Approach #2 - Using externally reachable NodePort Services without an Ingress Controller
+### Approach #2 - Using externally reachable NodePort Services without an Ingress Controller
 
 One or more single instance SDC Deployments configured for HTTPS will be deployed, each with a NodePort Service so that the SDCs are externally reachable.  No Ingress or Ingress Controllers are needed.
 Make sure to set these properties
