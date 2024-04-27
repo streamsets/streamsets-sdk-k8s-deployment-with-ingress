@@ -3,7 +3,7 @@ This project provides an example of how to use the [StreamSets Platform SDK](htt
 
 The project creates one or more [Kubernetes Deployments](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_ec3_cqg_hvb) of SDC using [Advanced Mode](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_mqh_hjk_bzb) configuration with HTTPS-based access to the deployed Data Collectors.  
 
-This project can be used to deploy SDC on Kubernetes with two different approaches. The first approach is best for use on Kubernetes environments that support LoadBalancer based ingress (like all public cloud Kubernetes providers). The second approach is best to use with single-instance standalone Kubernetes providers, for example Rancher running on your laptop.
+This project can be used to deploy SDC on Kubernetes with two different approaches. The first approach is best for use on Kubernetes environments that support LoadBalancer based ingress (like all public cloud Kubernetes providers). The second approach is best for use with on-prem layer-4 load balancers that mediate access to the Kubernetes cluster, or for single-instance standalone Kubernetes providers, for example Rancher running on your laptop.
 
 ### Approach #1 - Using an Ingress Controller with path-based routing
 
