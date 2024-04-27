@@ -7,7 +7,7 @@ This project can be used to deploy SDC on Kubernetes with two different approach
 
 ### Approach #1 - Using an Ingress Controller with path-based routing
 
-One or more single instance SDC Deployments will be deployed, each with a Service (either a ClusterIP or NodePort Service) and an Ingress, and a single Ingress Controller with path based routing, with either TLS terminated at the Ingress Controller, and with either HTTP or HTTPS-based communication from the Ingress Controller to the SDC backends. 
+One or more single instance SDC Deployments will be deployed, each with a Service (either a ClusterIP or NodePort Service) and an Ingress, and a single Ingress Controller with path based routing, with  TLS terminated at the Ingress Controller, and with either HTTP or HTTPS-based communication from the Ingress Controller to the SDC backends. 
 
 If you want to use a ClusterIP Service with an Ingress Controller (the preferred and most common approach), pay attention to these properties in your deployment.properties file (see below for details):
 ````
@@ -18,7 +18,7 @@ If you want to use a ClusterIP Service with an Ingress Controller (the preferred
 	SDC_DEPLOYMENT_MANIFEST   -- set this to a yaml that includes an Ingress resource and a ClusterIP service (example yamls are provided)
 ````
     
-If you want to use a NodePort Service with an Ingress Controller, make sure to also set this property:
+If you want to use a NodePort Service with an Ingress Controller, make sure to set these properties as well:
 
 ````
 	SERVICE_TYPE                    -- set this to NodePort
@@ -32,10 +32,9 @@ The ingress examples below use [ingress-nginx](https://kubernetes.github.io/ingr
 ### Approach #2 - Using externally reachable NodePort Services without an Ingress Controller
 
 One or more single instance SDC Deployments configured for HTTPS will be deployed, each with a NodePort Service so that the SDCs are externally reachable.  No Ingress or Ingress Controllers are needed.
-Make sure to set these properties
+Make sure to set these properties:
 ````
-
-	LOAD_BALANCER_HOSTNAME           -- set this to any reachable node in your Kubernetes cluster or to a layer-4 load balancer that sits in front of your cluster
+	LOAD_BALANCER_HOSTNAME           -- set this to any reachable node in the Kubernetes cluster or to a layer-4 load balancer that sits in front of the cluster
 	SERVICE_TYPE                     -- set this to NodePort
 	BACKEND_PROTOCOL                 -- set this to https
 	SDC_KEYSTORE                     -- set this to the name of your keystore
