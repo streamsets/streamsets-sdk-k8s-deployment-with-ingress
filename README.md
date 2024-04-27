@@ -558,7 +558,7 @@ Start the new Deployments, and wait for then all to become Active:
 
 Confirm all the engines are accessible:
 
-<img src="images/3-access.png" alt="access3" width="700"/>
+<img src="images/3-reachable.png" alt="access3" width="700"/>
 
 #### If you are using NodePort Services without an Ingress Controller
 
