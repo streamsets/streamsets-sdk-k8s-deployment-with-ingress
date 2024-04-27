@@ -3,7 +3,7 @@ This project provides an example of how to use the [StreamSets Platform SDK](htt
 
 The project creates one or more [Kubernetes Deployments](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_ec3_cqg_hvb) of SDC using [Advanced Mode](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_mqh_hjk_bzb) configuration with HTTPS-based access to the deployed Data Collectors.  
 
-The ingress examples below uses [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) as an Ingress Controller on both Azure Kubernetes Service (AKS) and Amazon Elastic Kubernetes Service (EKS).
+The ingress examples below use [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) as an Ingress Controller on both Azure Kubernetes Service (AKS) and Amazon Elastic Kubernetes Service (EKS).
 
 ### Prerequisites
 
@@ -11,11 +11,11 @@ The ingress examples below uses [ingress-nginx](https://kubernetes.github.io/ing
 
 - The StreamSets Organization should have the property [Enable WebSocket Tunneling for UI Communication](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/OrganizationSecurity/MyOrganization_title.html#task_whz_qjv_tqb) disabled.
 
-- An existing Kubernetes cluster with the ability to deploy an Ingress Controller. 
+- An existing Kubernetes cluster with the ability to deploy an Ingress Controller if ingress will be configured.  
 
 - [API Credentials](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/OrganizationSecurity/APICredentials_title.html#concept_vpm_p32_qqb) for a user with permissions to create Deployments 
 
-- The chosen Ingress Controller must support [regex-based URL path matching](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/) and path-based routing (both of which are supported by ingress-nginx)
+- If an Ingress Controller is used, it must support [regex-based URL path matching](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/) and path-based routing (both of which are supported by ingress-nginx)
 
 
 ### Versions used in the example
@@ -520,6 +520,6 @@ Confirm all the engines are accessible:
 
 #### If you are using NodePort Services without an Ingress Controller
 
-If you are using NodePort Services without an Ingress Controller, note the SDC URLS will have port numbers rather than paths, and if multiple deployments are created in a single run, the port numbers will be incremented for each SDC
+If you are using NodePort Services without an Ingress Controller, note the SDC URLS will have port numbers rather than paths, and if multiple deployments are created in a single run, the port numbers will be incremented for each SDC:
 
 <img src="images/np.png" alt="access3" width="700"/>
