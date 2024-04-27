@@ -3,7 +3,50 @@ This project provides an example of how to use the [StreamSets Platform SDK](htt
 
 The project creates one or more [Kubernetes Deployments](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_ec3_cqg_hvb) of SDC using [Advanced Mode](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_mqh_hjk_bzb) configuration with HTTPS-based access to the deployed Data Collectors.  
 
+This project can be used to deploy SDC on Kubernetes with two different approaches. The first approach is best for use on Kubernetes environments that support LoadBalancer based ingress (like all public cloud Kubernetes providers). The second approach is best to use with single-instance standalone Kubernetes providers, for example Rancher running on your laptop.
+
+#### Approach #1 - Using an Ingress Controller with path-based routing
+
+One or more single instance SDC Deployments will be deployed, each with a Service (either a ClusterIP or NodePort Service) and an Ingress, and a single Ingress Controller with path based routing, with either TLS terminated at the Ingress Controller, and with either HTTP or HTTPS-based communication from the Ingress Controller to the SDC backends. 
+
+If you want to use a ClusterIP Service with an Ingress Controller (the preferred and most common approach), pay attention to these properties in your deployment.properties file (see below for details):
+````
+	LOAD_BALANCER_HOSTNAME    -- set this to the front end hostname of your Ingress Controller
+	SERVICE_TYPE              -- set this to ClusterIP 
+	BACKEND_PROTOCOL          -- set this to http or https
+	SDC_KEYSTORE              -- if using https as the backend protocol, set this to the name of your keystore
+	SDC_DEPLOYMENT_MANIFEST   -- set this to a yaml that includes an Ingress resource and a ClusterIP service (example yamls are provided)
+````
+    
+If you want to use a NodePort Service with an Ingress Controller, make sure to also set this property:
+
+````
+	SERVICE_TYPE                    -- set this to NodePort
+	STARTING_NODE_PORT_SERVICE_PORT -- set this to a value between 30000 and 32767
+	SDC_DEPLOYMENT_MANIFEST         -- set this to a yaml that includes an Ingress resource and a NodePort service (example yamls are provided)
+````
+	
 The ingress examples below use [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) as an Ingress Controller on both Azure Kubernetes Service (AKS) and Amazon Elastic Kubernetes Service (EKS).
+
+
+#### Approach #2 - Using externally reachable NodePort Services without an Ingress Controller
+
+One or more single instance SDC Deployments configured for HTTPS will be deployed, each with a NodePort Service so that the SDCs are externally reachable.  No Ingress or Ingress Controllers are needed.
+Make sure to set these properties
+````
+
+	LOAD_BALANCER_HOSTNAME           -- set this to any reachable node in your Kubernetes cluster or to a layer-4 load balancer that sits in front of your cluster
+	SERVICE_TYPE                     -- set this to NodePort
+	BACKEND_PROTOCOL                 -- set this to https
+	SDC_KEYSTORE                     -- set this to the name of your keystore
+	SDC_DEPLOYMENT_MANIFEST          -- set this to a yaml that includes an NodePort Service and that does not include an Ingress (example yamls are provided) 
+	STARTING_NODE_PORT_SERVICE_PORT  -- set this to a value between 30000 and 32767
+	USE_NODE_PORT_INSTEAD_OF_INGRESS -- set this to true
+````      
+The property <code>USE_NODE_PORT_INSTEAD_OF_INGRESS</code> ensures that SDC URLs are of the form <code>https:\/\/\<hostname\>:\<port\></code> rather than of the form <code>https:\/\/\<hostname\>/\<path\></code> used when there is an ingress controller that perfoms path-based routing
+
+
+
 
 ### Prerequisites
 
