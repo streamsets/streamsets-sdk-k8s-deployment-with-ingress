@@ -1,9 +1,9 @@
 ## StreamSets SDK Kubernetes Deployment Example with Ingress
-This project provides an example of how to use the [StreamSets Platform SDK](https://docs.streamsets.com/platform-sdk/latest/index.html) to programmatically deploy one or more [Data Collectors](https://streamsets.com/products/data-collector-engine/) (SDC) on Kubernetes with a Service and Ingress for each. This approach may be necessary if [Direct REST APIs](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Engines/Communication.html#concept_dt2_hq3_34b) must be used rather than [WebSocket Tunneling](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Engines/Communication.html#concept_hbg_fq3_34b).
+This project provides an example of how to use the [StreamSets Platform SDK](https://docs.streamsets.com/platform-sdk/latest/index.html) to programmatically deploy one or more [Data Collectors](https://streamsets.com/products/data-collector-engine/) (SDC) on Kubernetes with each Data Collector having either a Service and Ingress, or an externally reachable NodePort Service. This example may be useful if [Direct REST APIs](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Engines/Communication.html#concept_dt2_hq3_34b) must be used rather than [WebSocket Tunneling](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Engines/Communication.html#concept_hbg_fq3_34b).
 
 The project creates one or more [Kubernetes Deployments](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_ec3_cqg_hvb) of SDC using [Advanced Mode](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Deployments/Kubernetes.html#concept_mqh_hjk_bzb) configuration with HTTPS-based access to the deployed Data Collectors.  
 
-The example below uses [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) as an Ingress Controller on both Azure Kubernetes Service (AKS) and Amazon Elastic Kubernetes Service (EKS).
+The ingress examples below uses [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) as an Ingress Controller on both Azure Kubernetes Service (AKS) and Amazon Elastic Kubernetes Service (EKS).
 
 ### Prerequisites
 
@@ -28,9 +28,11 @@ This example uses:
 
 - StreamSets Kubernetes Agent v1.1.2
 
-- AKS with Kubernetes version v1.28.5
+- AKS with Kubernetes v1.28.5
 
-- EKS with Kubernetes version v1.29
+- EKS with Kubernetes v1.29
+
+- Rancher v2.7.5 in standalone (single node) mode, with Kubernetes v1.26.4 +k3s1 (used for the NodePort Service example)
 
 
 ## Deploying the Example
@@ -41,7 +43,7 @@ Create a namespace for the StreamSets Deployment:
 <code>$ kubectl create ns ns1</code>
 
 
-### Deploy the Ingress Controller
+### Deploy the Ingress Controller (not needed for the NodePort Service Example)
 
 - For AKS, install ingress-nginx v1.10.0 using this command:
 
@@ -53,7 +55,7 @@ Create a namespace for the StreamSets Deployment:
 
 
 
-### Get the External IP for the Ingress Controller's Load Balancer Service
+### Get the External IP for the Ingress Controller's Load Balancer Service (not needed for the NodePort Service Example)
 
 - On AKS, the external IP will be an IP Address:
 
@@ -67,7 +69,7 @@ The full external IP value for my EKS LoadBalancer Service is:
 
     ae02d8966bb3e4c4c9c07cc7ef0416da-7f39be11bd31e542.elb.us-west-2.amazonaws.com
 
-### Map a DNS Name to the Load Balancer's IP
+### Map a DNS Name to the Load Balancer's IP 
 
 If you want to use your own DNS name, private key, and cert for the SDC ingress (to support HTTPS), start by mapping your own DNS name to the LoadBalancer's external IP.  I'll add DNS entries to my domain <code>onefoursix.com</code>:
 
@@ -96,8 +98,9 @@ If you want to use your own DNS name, private key, and cert for the SDC ingress 
 	Address: 44.224.0.85
 ```
 
+- For Rancher I added an A record to my DNS to map the name <code>rancher.onefoursix.com</code> to the IP address of my single Rancher node.
 
-### Set a TLS key and cert for the Load Balancer's DNS name
+### Set a TLS key and cert for the Load Balancer's DNS name (not needed for the NodePort Service Example)
 In this example, the ingress controller terminates TLS and can be configured to use either HTTP or HTTPS to connect to backend SDCs. A TLS key and cert is not necessary if the ingress is a Layer-4 load balancer just doing TCP passthrough without terminating TLS. 
 
 I'll use my own wildcard cert and key for <code>*.onefoursix.com</code> in the files <code>tls.crt</code> and <code>tls.key</code> respectively. 
@@ -106,16 +109,22 @@ Store the TLS key and cert in a Kubernetes tls Secret:
 
 	$ kubectl create secret -n ns1 tls streamsets-tls \
     	--key ~/certs/tls.key --cert ~/certs/tls.crt
+    	
+For the NodePort Service example running on Rancher, the NodePort Service just does TCP passthrough to the SDC Pods, and we'll configure SDC to use HTTPS with its own keystore. No other TLS configuration is needed.
 
-### [Optional] Set an SDC keystore and password
+### Set an SDC keystore and password
 
-If the backend protocol is <code>https</code> we'll need to set a custom keystore for SDC. I'll package the same TLS key and cert I used for the load balancer into a keystore named <code>onefoursix.p12</code>, and save that keystore in a Kubernetes Secret named sdc-keystore:
+If you are using an Ingress Controller and its backend protocol is <code>HTTP</code>, SDC does not need a keystore
+
+However, if the backend protocol is <code>HTTPS</code> we'll need to set a custom keystore for SDC. I'll package the same TLS key and cert I used for the load balancer into a keystore named <code>onefoursix.p12</code>, and save that keystore in a Kubernetes Secret named sdc-keystore:
 
     $ kubectl -n ns1 create secret generic sdc-keystore --from-file=onefoursix.p12
 
 I'll also save the keystore password in a secret named sdc-keystore-password
 
 	$ kubectl -n ns1 create secret generic sdc-keystore-password --from-file=keystore-password.txt
+
+Note that for the NodePort Service example, SDC must use HTTPS with its own keystore
 
 ### Create a Kubernetes Environment
 
@@ -124,6 +133,9 @@ The [Kubernetes Environment](https://docs.streamsets.com/portal/platform-control
 - For AKS, I'll create a new Kubernetes Environment named <code>aks-ns1</code> and set the namespace to <code>ns1</code>.
 
 - For EKS, I'll create a new Kubernetes Environment named <code>eks-ns1</code> and set the namespace to <code>ns1</code>.
+
+- For Rancher, I'll create a new Kubernetes Environment named <code>rancher</code> and set the namespace to <code>ns1</code>.
+
 
 Activate your environment but do not play the generated shell command; instead, click the <code>View Kubernetes YAML</code> button. In the dialog that opens, click the <code>copy</code> button. Paste the text into a text document on your local machine named <code>agent.yaml</code> (the name is not critical).
 
@@ -189,13 +201,13 @@ For example, here is a <code>deployment.properties</code> file for an AKS enviro
 
 ```
 [deployment]
-SCH_URL=https://na01.hub.streamsets.com
-ORG_ID=20677965-affe-11ee-b630-8d34cf7885a7
-LOAD_BALANCER_HOSTNAME=aks.onefoursix.com
+SCH_URL=https://<your-region>.hub.streamsets.com
+ORG_ID=xxxxxxxx
+LOAD_BALANCER_HOSTNAME=lb.acme.com
 SERVICE_TYPE=ClusterIP
 BACKEND_PROTOCOL=https
-SDC_KEYSTORE=onefoursix.p12
-SDC_DEPLOYMENT_MANIFEST=yaml/sdc-service-ingress-keystore.yaml
+SDC_KEYSTORE=your-custom-keystore.p12
+SDC_DEPLOYMENT_MANIFEST=yaml/clusterIP-ingress-keystore.yaml
 SDC_VERSION=5.10.0
 DEPLOYMENT_TAGS=k8s-sdc-5.10.0,california
 USER_STAGE_LIBS=apache-kafka_3_4,aws,aws-secrets-manager-credentialstore,jdbc,jython_2_7,sdc-snowflake
@@ -206,8 +218,8 @@ SDC_MAX_PIPELINES_RUNNING=10
 SDC_JAVA_MIN_HEAP_MB=2024
 SDC_JAVA_MAX_HEAP_MB=2024
 SDC_JAVA_OPTS=""
-REQUESTS_MEMORY=1Gi
-LIMITS_MEMORY=2Gi
+REQUESTS_MEMORY=3Gi
+LIMITS_MEMORY=3Gi
 REQUESTS_CPU=1000m
 LIMITS_CPU=3000m
 ```
@@ -219,6 +231,10 @@ See the manifest [here](yaml/create-sdc-sa-example.yaml) for an example of how t
 
 #### Service Types
 Most commonly, the <code>SERVICE_TYPE</code> property will be set to <code>ClusterIP</code>. However, if you want to create <code>NodePort</code> services, set the <code>SERVICE_TYPE</code> property to <code>NodePort</code> and also set the <code>STARTING_NODE_PORT_SERVICE_PORT</code> property to a value between 30000 and 32767.  If multiple deployments are created in a single run, this starting value will be incremented by 1 for each subsequent deployment.
+
+Use one of the ClusterIP-based deployment.properties and yaml examples if you are using a ClusterIP Service, and use one of the NodePort examples if you are using a NodePort Service.
+
+If you are using NodePort Services without an ingress controller, start with the [deployment.property example that does not have an ingress](config/examples/nodeport-instead-of-ingress-deployment-example.properties) that refers to a [manifest without an ingress](yaml/node-port-no-ingress.yaml). Also, make sure to set <code>USE_NODE_PORT_INSTEAD_OF_INGRESS=true</code> in your deployment.properties file as that will cause the SDC URLs to be of the form <code>https:\/\/\<hostname\>:\<port\></code> rather than of the form <code>https:\/\/\<hostname\>/\<path\></code> used when there is an ingress controller that perfoms path-based routing.
 
 
 #### Edit additional config files  (optional) 
@@ -236,11 +252,11 @@ Note that the included <code>sdc.properties</code> file is a template that conta
 
 #### Edit the deployment manifest (optional) 
 
-Edit the manifest file <code>yaml/sdc-service-ingress.yaml</code> template as needed as well.  Note that many of the property values, like <code>${DEP_ID}</code> will be replaced by the Python script. 
+Edit the manifest file referenced by your deployment.properties if needed as well.  Note that many of the property values, like <code>${DEP_ID}</code> will be replaced by the Python script. 
 
 
 ### Set your API Credentials
-Create a file named <code>sdk-env.sh</code> with your[API credentials] in the project's [private](private) directory as quoted strings with no spaces, like this:
+Create a file named <code>sdk-env.sh</code> with your[API credentials](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/OrganizationSecurity/APICredentials_title.html#concept_vpm_p32_qqb) in the project's [private](private) directory as quoted strings with no spaces, like this:
 
 	export CRED_ID="esdgew……193d2"
 	export CRED_TOKEN="eyJ0…………J9."
@@ -258,15 +274,15 @@ Execute the script, passing it three args:
 
 For example:
 
-	./create-k8s-deployment.sh config/aks-deployment.properties aks-ns1 sdc1
+	./create-k8s-deployment.sh config/deployment.properties aks-ns1 sdc1
 
 If all goes well you should see console output like this:
 ```
-$ ./create-k8s-deployment.sh config/aks-deployment.properties aks-ns1 sdc1
+$ ./create-k8s-deployment.sh config/deployment.properties aks-ns1 sdc1
 
 ---------
 Creating StreamSets Deployment
-Deployment Properties File:  config/aks-deployment.properties
+Deployment Properties File:  config/deployment.properties
 Environment Name:  aks-ns1
 Deployment Suffix:  sdc1
 ---------
@@ -350,16 +366,16 @@ Execute the script, passing it three args:
 
 For example:
 
-	./create-multiple-k8s-deployments.sh config/aks-deployment.properties aks-ns1 sdc1,sdc2,sdc3
+	./create-multiple-k8s-deployments.sh config/deployment.properties aks-ns1 sdc1,sdc2,sdc3
 
 If all goes well you should see console output like this:
 
 ```
-$ ./create-multiple-k8s-deployments.sh config/aks-deployment.properties aks-ns1 sdc1,sdc2,sdc3
+$ ./create-multiple-k8s-deployments.sh config/deployment.properties aks-ns1 sdc1,sdc2,sdc3
 
 ---------
 Creating StreamSets Deployments
-Deployment Properties File:  config/aks-deployment.properties
+Deployment Properties File:  config/deployment.properties
 Environment Name:  aks-ns1
 Deployment Suffixes:  sdc1,sdc2,sdc3
 ---------
@@ -502,3 +518,8 @@ Confirm all the engines are accessible:
 
 <img src="images/3-access.png" alt="access3" width="700"/>
 
+#### If you are using NodePort Services without an Ingress Controller
+
+If you are using NodePort Services without an Ingress Controller, note the SDC URLS will have port numbers rather than paths, and if multiple deployments are created in a single run, the port numbers will be incremented for each SDC
+
+<img src="images/np.png" alt="access3" width="700"/>

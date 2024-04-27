@@ -47,6 +47,13 @@ SERVICE_TYPE=ClusterIP
 # STARTING_NODE_PORT_SERVICE_PORT=31630
 STARTING_NODE_PORT_SERVICE_PORT=
 
+# If an Ingress resource is not required and a NodePort Service port
+# will be used instead (perhaps behind a layer 4 load balancer), set
+# USE_NODE_PORT_INSTEAD_OF_INGRESS=true and set SDC_DEPLOYMENT_MANIFEST
+# to a use a manifest without an ingress. This property can be omitted 
+and will default to false, and will otherwise be ignored if SERVICE_TYPE=ClusterIP
+USE_NODE_PORT_INSTEAD_OF_INGRESS=
+
 # An SDC deployment manifest template that also includes a service and ingress
 # For example:
 # SDC_DEPLOYMENT_MANIFEST=yaml/sdc-service-ingress.yaml

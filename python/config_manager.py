@@ -28,13 +28,19 @@ class ConfigManager:
 
     # Raise an exception if a deployment property value does not exist for a given key
     def assert_property_is_not_null(self, key):
+        if key not in self.deployment_properties.keys():
+            raise Exception('The property key \'%s\' does not exist in the deployment property file \'%s\'.'
+                            % (key, self.deployment_properties_file))
         value = self.deployment_properties[key].strip()
         if value is None or len(value) == 0:
-            raise Exception('No value for deployment property key \'' + key + '\'')
+            raise Exception('No value for the key \'%s\' in the deployment property file \'%s\'.'
+                            % (key, self.deployment_properties_file))
+
 
     def validate_deployment_properties(self):
         self.check_required_properties()
         self.check_service_type_and_port()
+        self.set_sdc_service_account()
 
     def check_required_properties(self):
         self.assert_property_is_not_null('SCH_URL')
@@ -113,7 +119,8 @@ class ConfigManager:
                                  ' or set the value of \'streamsets.jks\' to use StreamSets\' self-signed-cert.')
                 raise Exception(error_message)
         else:
-            self.deployment_properties['SDC_KEYSTORE'] = 'keystore.jks'  # We'll set this to the default SDC keystore even though we won't use it
+            self.deployment_properties[
+                'SDC_KEYSTORE'] = 'keystore.jks'  # We'll set this to the default SDC keystore even though we won't use it
 
     def get_property_array_value(self, key):
         if key in self.deployment_properties.keys():
@@ -132,14 +139,22 @@ class ConfigManager:
         return self.get_property_array_value('ENGINE_LABELS')
 
     # Get the SDC Service Account from the deployment properties
-    # If the property does not exist or is empty, return 'default"
-    def get_sdc_service_account(self):
+    # If the property does not exist or is empty, return 'default'
+    def set_sdc_service_account(self):
+        self.deployment_properties['SDC_SERVICE_ACCOUNT'] = 'default'
         if 'SDC_SERVICE_ACCOUNT' in self.deployment_properties.keys():
             sa = self.deployment_properties['SDC_SERVICE_ACCOUNT'].strip()
             if len(sa) > 0:
-                return sa
-        return 'default'
+                self.deployment_properties['SDC_SERVICE_ACCOUNT'] = sa
 
-
+    # Returns a config property value for a key,
+    # with boolean conversions
     def get(self, key):
-        return self.deployment_properties[key]
+        value = self.deployment_properties[key].strip()
+        if value.lower() == 'true':
+            return True
+        elif value.lower() == 'false':
+            return False
+        else:
+            return value
+

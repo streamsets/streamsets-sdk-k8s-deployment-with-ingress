@@ -26,7 +26,8 @@ from config_manager import ConfigManager
 # Check the number of command line args
 if len(sys.argv) not in (4, 5):
     print('Error: Wrong number of arguments')
-    print('Usage: $ python3 create-k8s-deployment.py <deployment_properties_file> <environment_name> <deployment_suffix> [<deployment_index>]')
+    print(
+        'Usage: $ python3 create-k8s-deployment.py <deployment_properties_file> <environment_name> <deployment_suffix> [<deployment_index>]')
     print('Usage Example: $ python3 create-k8s-deployment.py config/eks-deployment.properties env-1 sdc1')
     sys.exit(1)
 
@@ -37,7 +38,8 @@ deployment_suffix = sys.argv[3]
 
 # Make sure deployment suffix is valid
 if not re.match("^[A-Za-z0-9-]*$", deployment_suffix):
-    print('Error: Deployment suffix \'{}\' is invalid. It should only contain letters, numbers, or a hyphen.'.format(deployment_suffix))
+    print('Error: Deployment suffix \'{}\' is invalid. It should only contain letters, numbers, or a hyphen.'.format(
+        deployment_suffix))
     sys.exit(1)
 
 # If this script is called multiple times in a single run, we'll keep track using the deployment index
@@ -45,8 +47,6 @@ if len(sys.argv) == 5:
     deployment_index = int(sys.argv[4])
 else:
     deployment_index = 0
-
-
 
 
 def print_message(message):
@@ -58,6 +58,10 @@ def replace_in_yaml(yaml, key, value):
 
 # Load properties from the deployment.properties file
 config = ConfigManager(deployment_properties_file, deployment_index)
+
+# Load the deployment manifest template
+with open(config.get('SDC_DEPLOYMENT_MANIFEST')) as f:
+    yaml = f.read()
 
 # Get Control Hub API credentials from the environment
 cred_id = os.getenv('CRED_ID')
@@ -126,7 +130,11 @@ with open('etc/sdc.properties') as f:
     sdc_properties = f.read()
 
 # Create and set the SDC URL
-sdc_url = 'https://' + config.get('LOAD_BALANCER_HOSTNAME') + '/' + deployment_suffix + '/'
+if config.get('USE_NODE_PORT_INSTEAD_OF_INGRESS'):
+    sdc_url = 'https://' + config.get('LOAD_BALANCER_HOSTNAME') + ':' + config.get('SERVICE_PORT')
+else:
+    sdc_url = 'https://' + config.get('LOAD_BALANCER_HOSTNAME') + '/' + deployment_suffix + '/'
+
 print_message('- Setting URL to ' + sdc_url)
 sdc_properties = sdc_properties.replace('${SDC_BASE_HTTP_URL}', sdc_url)
 
@@ -146,25 +154,25 @@ print_message('---')
 advanced_engine_config.data_collector_configuration = sdc_properties
 
 # credential-stores.properties
-print_message('Loading credential-stores.properties') 
+print_message('Loading credential-stores.properties')
 with open('etc/credential-stores.properties') as f:
     credential_stores = f.read()
 advanced_engine_config.credential_stores = credential_stores
 
 # security_policy
-print_message('Loading security.policy') 
+print_message('Loading security.policy')
 with open('etc/security.policy') as f:
     security_policy = f.read()
 advanced_engine_config.security_policy = security_policy
 
 # log4j2
-print_message('Loading sdc-log4j2.properties') 
+print_message('Loading sdc-log4j2.properties')
 with open('etc/sdc-log4j2.properties') as f:
     log4j2 = f.read()
 advanced_engine_config.log4j2 = log4j2
 
 # proxy.properties
-print_message('Loading proxy.properties') 
+print_message('Loading proxy.properties')
 with open('etc/proxy.properties') as f:
     proxy_properties = f.read()
 advanced_engine_config.proxy_properties = proxy_properties
@@ -173,33 +181,34 @@ advanced_engine_config.proxy_properties = proxy_properties
 sch.update_deployment(deployment)
 
 # Set advanced mode to True to support custom YAML
+# noinspection PyProtectedMember
 deployment._data["advancedMode"] = True
 
 # Load the SDC Deployment manifest from the file
 print_message('---')
 print_message('Setting values in yaml template \'%s\':' % config.get('SDC_DEPLOYMENT_MANIFEST'))
-with open(config.get('SDC_DEPLOYMENT_MANIFEST')) as f:
-    yaml = f.read()
+
 # Get the first part of the deployment ID
 short_deployment_id = deployment.deployment_id[0:deployment.deployment_id.index(':')]
 
 # Replace the tokens in the YAML template
-yaml = replace_in_yaml(yaml, '${DEP_ID}', short_deployment_id)
-yaml = replace_in_yaml(yaml, '${NAMESPACE}', namespace)
-yaml = replace_in_yaml(yaml, '${SDC_VERSION}', config.get('SDC_VERSION'))
-yaml = replace_in_yaml(yaml, '${SDC_SERVICE_ACCOUNT}', config.get_sdc_service_account())
-yaml = replace_in_yaml(yaml, '${ORG_ID}', config.get('ORG_ID'))
-yaml = replace_in_yaml(yaml, '${SCH_URL}', config.get('SCH_URL'))
-yaml = replace_in_yaml(yaml, '${REQUESTS_MEMORY}', config.get('REQUESTS_MEMORY'))
-yaml = replace_in_yaml(yaml, '${LIMITS_MEMORY}', config.get('LIMITS_MEMORY'))
-yaml = replace_in_yaml(yaml, '${REQUESTS_CPU}', config.get('REQUESTS_CPU'))
-yaml = replace_in_yaml(yaml, '${LIMITS_CPU}', config.get('LIMITS_CPU'))
-yaml = replace_in_yaml(yaml, '${DEPLOYMENT_SUFFIX}', deployment_suffix)
-yaml = replace_in_yaml(yaml, '${SERVICE_TYPE}', config.get('SERVICE_TYPE'))
-yaml = replace_in_yaml(yaml, '${SERVICE_PORT}', config.get('SERVICE_PORT'))
-yaml = replace_in_yaml(yaml, '${LOAD_BALANCER_HOSTNAME}', config.get('LOAD_BALANCER_HOSTNAME'))
-yaml = replace_in_yaml(yaml, '${BACKEND_PROTOCOL}', config.get('BACKEND_PROTOCOL').upper())
-yaml = replace_in_yaml(yaml, '${KEYSTORE}', config.get('SDC_KEYSTORE'))
+yaml = replace_in_yaml(yaml,'${DEP_ID}', short_deployment_id)
+yaml = replace_in_yaml(yaml,'${NAMESPACE}', namespace)
+yaml = replace_in_yaml(yaml,'${SDC_VERSION}', config.get('SDC_VERSION'))
+yaml = replace_in_yaml(yaml,'${SDC_SERVICE_ACCOUNT}', config.get('SDC_SERVICE_ACCOUNT'))
+yaml = replace_in_yaml(yaml,'${ORG_ID}', config.get('ORG_ID'))
+yaml = replace_in_yaml(yaml,'${SCH_URL}', config.get('SCH_URL'))
+yaml = replace_in_yaml(yaml,'${REQUESTS_MEMORY}', config.get('REQUESTS_MEMORY'))
+yaml = replace_in_yaml(yaml,'${LIMITS_MEMORY}', config.get('LIMITS_MEMORY'))
+yaml = replace_in_yaml(yaml,'${REQUESTS_CPU}', config.get('REQUESTS_CPU'))
+yaml = replace_in_yaml(yaml,'${LIMITS_CPU}', config.get('LIMITS_CPU'))
+yaml = replace_in_yaml(yaml,'${DEPLOYMENT_SUFFIX}', deployment_suffix)
+yaml = replace_in_yaml(yaml,'${SERVICE_TYPE}', config.get('SERVICE_TYPE'))
+yaml = replace_in_yaml(yaml,'${SERVICE_PORT}', config.get('SERVICE_PORT'))
+yaml = replace_in_yaml(yaml,'${LOAD_BALANCER_HOSTNAME}', config.get('LOAD_BALANCER_HOSTNAME'))
+yaml = replace_in_yaml(yaml,'${BACKEND_PROTOCOL}', config.get('BACKEND_PROTOCOL').upper())
+yaml = replace_in_yaml(yaml,'${KEYSTORE}', config.get('SDC_KEYSTORE'))
+
 print_message('---')
 
 # Print the generated yaml if needed for debugging
@@ -212,7 +221,7 @@ deployment.yaml = yaml
 sch.update_deployment(deployment)
 
 # (Optional) Autostart the deployment
-#print_message('Starting the deployment...')
-#sch.start_deployment(deployment)
+# print_message('Starting the deployment...')
+# sch.start_deployment(deployment)
 
 print_message('Done')

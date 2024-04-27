@@ -31,14 +31,14 @@ do
   echo "Environment Name" ${ENVIRONMENT_NAME}
   echo "SDC Suffix:" "${SUFFIX}"
   echo "---------"
-  export DEPLOYMENT_SUFFIX=${SUFFIX}
-  export DEPLOYMENT_INDEX=${INDEX}
+  DEPLOYMENT_SUFFIX=${SUFFIX}
+  DEPLOYMENT_INDEX=${INDEX}
 
   # Launch the SDK script
   python3 python/create-k8s-deployment.py ${DEPLOYMENT_PROPERTIES_FILE} ${ENVIRONMENT_NAME} ${SUFFIX} ${DEPLOYMENT_INDEX}
 
   # Bump the deployment index
-  index=$((index+1))
+  INDEX=$((INDEX+1))
 done
 
 
