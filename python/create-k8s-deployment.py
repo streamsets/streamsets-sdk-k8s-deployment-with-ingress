@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# IBM Confidential
+# PID 5900-BAF
+# Copyright StreamSets Inc., an IBM Company 2024
 
 """
 This script creates and optionally starts a Kubernetes Deployment on StreamSets Platform
