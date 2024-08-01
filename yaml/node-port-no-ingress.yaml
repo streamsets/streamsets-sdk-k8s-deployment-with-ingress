@@ -1,3 +1,6 @@
+# IBM Confidential
+# PID 5900-BAF
+# Copyright StreamSets Inc., an IBM Company 2024
 apiVersion: apps/v1
 kind: Deployment
 metadata:

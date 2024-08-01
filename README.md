@@ -1,3 +1,6 @@
+[comment]: <> ( IBM Confidential )
+[comment]: <> ( PID 5900-BAF )
+[comment]: <> ( Copyright StreamSets Inc., an IBM Company 2024 )
 ## StreamSets SDK Kubernetes Deployment Example with Ingress
 This project provides an example of how to use the [StreamSets Platform SDK](https://docs.streamsets.com/platform-sdk/latest/index.html) to programmatically deploy one or more [Data Collectors](https://streamsets.com/products/data-collector-engine/) (SDC) on Kubernetes with each Data Collector having either a Service and Ingress, or an externally reachable NodePort Service. This example may be useful if [Direct REST APIs](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Engines/Communication.html#concept_dt2_hq3_34b) must be used rather than [WebSocket Tunneling](https://docs.streamsets.com/portal/platform-controlhub/controlhub/UserGuide/Engines/Communication.html#concept_hbg_fq3_34b).
 

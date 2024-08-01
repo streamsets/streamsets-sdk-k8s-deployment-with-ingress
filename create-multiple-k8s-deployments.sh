@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# IBM Confidential
+# PID 5900-BAF
+# Copyright StreamSets Inc., an IBM Company 2024
 
 # Check the number of arguments
 if [ "$#" -ne 3 ]; then
