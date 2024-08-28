@@ -20,23 +20,23 @@ spec:
       - name: streamsets-engine-${DEP_ID}
         image: streamsets/datacollector:${SDC_VERSION}
         startupProbe:
-            failureThreshold: 60
-            httpGet:
-              path: /public-rest/ping
-              port: engine-port
-              scheme: HTTPS
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
+          failureThreshold: 60
+          httpGet:
+            path: /public-rest/ping
+            port: engine-port
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
         livenessProbe:
-            failureThreshold: 20
-            httpGet:
-              path: /public-rest/ping
-              port: engine-port
-              scheme: HTTPS
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 5
+          failureThreshold: 20
+          httpGet:
+            path: /public-rest/ping
+            port: engine-port
+            scheme: HTTPS
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
         env:
         - name: STREAMSETS_DEPLOYMENT_ID
           value: ${DEP_ID}:${ORG_ID}
