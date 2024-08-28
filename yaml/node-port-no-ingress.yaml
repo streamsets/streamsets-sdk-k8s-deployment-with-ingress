@@ -19,6 +19,24 @@ spec:
       containers:
       - name: streamsets-engine-${DEP_ID}
         image: streamsets/datacollector:${SDC_VERSION}
+        startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /public-rest/ping
+              port: engine-port
+              scheme: HTTPS
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+        livenessProbe:
+            failureThreshold: 20
+            httpGet:
+              path: /public-rest/ping
+              port: engine-port
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
         env:
         - name: STREAMSETS_DEPLOYMENT_ID
           value: ${DEP_ID}:${ORG_ID}
@@ -30,6 +48,9 @@ spec:
               optional: false
         - name: STREAMSETS_DEPLOYMENT_SCH_URL
           value: ${SCH_URL}
+        ports:
+        - containerPort: 18630
+          name: engine-port
         resources:
           requests:
             memory: "${REQUESTS_MEMORY}"
