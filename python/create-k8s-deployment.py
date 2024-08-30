@@ -41,6 +41,10 @@ if not re.match("^[A-Za-z0-9-]*$", deployment_suffix):
     print('Error: Deployment suffix \'{}\' is invalid. It should only contain letters, numbers, or a hyphen.'.format(
         deployment_suffix))
     sys.exit(1)
+elif not deployment_suffix[0].isalpha():
+     print('Error: Deployment suffix \'{}\' is invalid; it must start with a letter.'.format(
+        deployment_suffix))
+    sys.exit(1)
 
 # If this script is called multiple times in a single run, we'll keep track using the deployment index
 if len(sys.argv) == 5:
