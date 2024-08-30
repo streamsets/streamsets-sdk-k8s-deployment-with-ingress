@@ -42,7 +42,7 @@ if not re.match("^[A-Za-z0-9-]*$", deployment_suffix):
         deployment_suffix))
     sys.exit(1)
 elif not deployment_suffix[0].isalpha():
-     print('Error: Deployment suffix \'{}\' is invalid; it must start with a letter.'.format(
+    print('Error: Deployment suffix \'{}\' is invalid; it must start with a letter.'.format(
         deployment_suffix))
     sys.exit(1)
 
