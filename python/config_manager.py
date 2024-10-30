@@ -116,7 +116,7 @@ class ConfigManager:
             except Exception:
                 error_message = ('BACKEND_PROTOCOL is \'https\' but no value provided for the ' +
                                  '\'SDC_KEYSTORE\' property. Either set the name of your own keystore, ' +
-                                 ' or set the value of \'streamsets.jks\' to use StreamSets\' self-signed-cert.')
+                                 ' or set the value of \'keystore.jks\' to use StreamSets\' self-signed-cert.')
                 raise Exception(error_message)
         else:
             self.deployment_properties[
