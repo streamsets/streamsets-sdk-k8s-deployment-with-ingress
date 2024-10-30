@@ -368,7 +368,22 @@ Deployment Suffix:  sdc1
 2024-04-21 21:30:12 Done
 ```
 
+#### A note regarding errors when creating the ingress
+If you get an error like thiswhen trying to create an ingress:
+```
+Warning: path /sdc2(/|$)(.*) cannot be used with pathType Prefix
+Error from server (BadRequest): error when creating "/Users/mark/Downloads/deployment.yaml": admission webhook "validate.nginx.ingress.kubernetes.io" denied the request: ingress contains invalid paths: path /sdc2(/|$)(.*) cannot be used with pathType Prefix
+```
 
+Edit the ingress and  change this ine:
+
+``` pathType: Prefix```
+
+to:
+
+``` pathType: ImplementationSpecific ```
+
+ 
 
 #### Inspect the Deployment
 You should see a new Deployment in Control Hub in a Deactivated state.  (You can uncomment the second to last line in the Python script to have Deployments autostart once you have confidence in the process.)
