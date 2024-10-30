@@ -368,8 +368,8 @@ Deployment Suffix:  sdc1
 2024-04-21 21:30:12 Done
 ```
 
-#### A note regarding errors when creating the ingress
-If you get an error like thiswhen trying to create an ingress:
+#### Ingress errors
+If you get an error like this when trying to create an ingress:
 ```
 Warning: path /sdc2(/|$)(.*) cannot be used with pathType Prefix
 Error from server (BadRequest): error when creating "/Users/mark/Downloads/deployment.yaml": admission webhook "validate.nginx.ingress.kubernetes.io" denied the request: ingress contains invalid paths: path /sdc2(/|$)(.*) cannot be used with pathType Prefix
