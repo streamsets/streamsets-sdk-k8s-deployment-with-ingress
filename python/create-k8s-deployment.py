@@ -137,7 +137,7 @@ with open('etc/sdc.properties') as f:
 if config.get('USE_NODE_PORT_INSTEAD_OF_INGRESS'):
     sdc_url = 'https://' + config.get('LOAD_BALANCER_HOSTNAME') + ':' + config.get('SERVICE_PORT')
 else:
-    sdc_url = 'https://' + config.get('LOAD_BALANCER_HOSTNAME') + '/' + deployment_suffix + '/'
+    sdc_url = 'https://' + config.get('LOAD_BALANCER_HOSTNAME') + '/' + deployment_suffix
 
 print_message('- Setting URL to ' + sdc_url)
 sdc_properties = sdc_properties.replace('${SDC_BASE_HTTP_URL}', sdc_url)
