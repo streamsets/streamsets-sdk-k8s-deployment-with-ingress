@@ -195,6 +195,7 @@ And add this new section:
 ```
 - apiGroups: ["networking.k8s.io"]
   resources: ["ingresses"]
+  verbs: ["get", "list", "create", "patch", "delete"]
 ```
 
 Those changes will allow the Kubernetes Agent to create Service and Ingress resources
